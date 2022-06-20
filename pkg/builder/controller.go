@@ -327,6 +327,16 @@ func (blder *Builder) doController(r reconcile.Reconciler) error {
 			}
 			return log
 		}
+	} else {
+		constructor := ctrlOptions.LogConstructor
+		ctrlOptions.LogConstructor = func(request *reconcile.Request) logr.Logger {
+			log := constructor(request)
+			return log.WithValues(
+				"controller", controllerName,
+				"controllerGroup", gvk.Group,
+				"controllerKind", gvk.Kind,
+			)
+		}
 	}
 
 	// Build the controller and return.
